@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import TaskList from "./pages/TaskList";
+import LoggersList from "./pages/loggersList";
+
 import TaskForm from "./pages/TaskForm";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -47,6 +49,14 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <TaskList />
+                </ProtectedRoute>
+              }
+            />
+               <Route
+              path="/loggers"
+              element={
+                <ProtectedRoute>
+                  <LoggersList />
                 </ProtectedRoute>
               }
             />

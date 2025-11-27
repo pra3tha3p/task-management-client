@@ -46,6 +46,13 @@ const Navbar = () => {
                             Tasks
                         </Link>
                         <Link
+                            to="/loggers"
+                            style={{ color: isActive("/loggers") ? "var(--primary-color)" : "" }}
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            History
+                        </Link>
+                        <Link
                             to="/tasks/new"
                             className="btn btn-primary"
                             onClick={() => setIsMenuOpen(false)}

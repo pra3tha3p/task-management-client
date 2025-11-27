@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import TaskFormModal from "../components/TaskFormModal";
 
 const TaskList = () => {
     const [tasks, setTasks] = useState([]);
-    const [filter, setFilter] = useState("all");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const filter = searchParams.get("filter") || "all";
     const [loading, setLoading] = useState(true);
+    const [editingTask, setEditingTask] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         fetchTasks();
     }, []);
+
+    const setFilter = (newFilter) => {
+        setSearchParams({ filter: newFilter });
+    };
 
     const fetchTasks = async () => {
         try {
@@ -42,11 +50,21 @@ const TaskList = () => {
         }
     };
 
+    const handleEdit = (task) => {
+        setEditingTask(task);
+        setShowModal(true);
+    };
+
+    const handleNewTask = () => {
+        setEditingTask(null);
+        setShowModal(true);
+    };
+
     const filteredTasks = tasks.filter((task) => {
         if (filter === "all") return true;
         if (filter === "completed") return task.status === "completed";
         if (filter === "pending") return task.status !== "completed";
-        if (filter === "overdue") return task.is_overdue;
+        if (filter === "overdue") return task.is_overdue && task.status !== "completed";
         return true;
     });
 
@@ -66,7 +84,7 @@ const TaskList = () => {
                     <button onClick={() => setFilter("completed")} className={filter === "completed" ? "active" : ""}>Completed</button>
                     <button onClick={() => setFilter("overdue")} className={filter === "overdue" ? "active" : ""}>Overdue</button>
                 </div>
-                <Link to="/tasks/new" className="btn btn-primary">New Task</Link>
+                <button onClick={handleNewTask} className="btn btn-primary">New Task</button>
             </div>
 
             <div className="task-list">
@@ -106,7 +124,7 @@ const TaskList = () => {
                                     {isTaskBlocked(task) ? "Blocked" : "Complete"}
                                 </button>
                             )}
-                            <Link to={`/tasks/edit/${task.id}`} className="btn btn-secondary" style={{ textAlign: 'center', display: 'block' }}>Edit</Link>
+                            <button onClick={() => handleEdit(task)} className="btn btn-secondary">Edit</button>
                             <button onClick={() => handleDelete(task.id)} className="btn btn-danger">Delete</button>
                         </div>
                     </div>
@@ -117,6 +135,12 @@ const TaskList = () => {
                     <p>No tasks found matching your filter.</p>
                 </div>
             )}
+            <TaskFormModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onTaskCreated={fetchTasks}
+                taskToEdit={editingTask}
+            />
         </div>
     );
 };
